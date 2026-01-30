@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Mood – Kokoro</title>
+  <script defer src="https://unpkg.com/face-api.js"></script>
+  <style>
+    body {
+      background: #E6D9FF;
+      font-family: Arial;
+      text-align: center;
+      padding-top: 40px;
+    }
+    .card {
+      background: white;
+      width: 350px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 15px;
+    }
+    img {
+      width: 250px;
+      margin-top: 10px;
+      border-radius: 10px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #9C7CFF;
+      color: white;
+      cursor: pointer;
+      
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h3>How are you feeling?</h3>
+  <input type="file" id="imageUpload" accept="image/*"><br>
+  <img id="preview" />
+  <p id="status">Loading AI models...</p>
+  <p id="result"></p>
+  <button onclick="analyzeMood()">Analyze Mood</button>
+</div>
+<script>
+const statusText = document.getElementById("status")
+const resultText = document.getElementById("result")
+const preview = document.getElementById("preview")
+async function loadModels() {
+  try {
+    await faceapi.nets.tinyFaceDetector.loadFromUri('./models')
+    await faceapi.nets.faceExpressionNet.loadFromUri('./models')
+    statusText.innerText = "Models loaded ✅ Upload a photo"
+  } catch (err) {
+    statusText.innerText = "❌ Model loading failed"
+    console.error(err)
+  }
+}
+loadModels()
+document.getElementById('imageUpload').addEventListener('change', () => {
+  preview.src = URL.createObjectURL(imageUpload.files[0])
+})
+async function analyzeMood() {
+  resultText.innerText = "Analyzing..."
+
+  const detection = await faceapi
+    .detectSingleFace(preview, new faceapi.TinyFaceDetectorOptions())
+    .withFaceExpressions()
+
+  if (!detection) {
+    resultText.innerText = "😕 Face not detected. Try a clearer photo."
+    return
+  }
+
+  const expressions = detection.expressions
+  const mood = Object.entries(expressions)
+    .sort((a, b) => b[1] - a[1])[0][0]
+
+  const moodMap = {
+    happy: "😊 You look happy",
+    sad: "😔 You seem sad",
+    angry: "😠 You look angry",
+    neutral: "😐 You look calm",
+    surprised: "😮 You look surprised",
+    fearful: "😨 You look anxious",
+    disgusted: "😖 You look uncomfortable"
+  }
+
+  resultText.innerText = moodMap[mood] || "Mood unclear"
+}
+</script>
+
+
+</body>
+</html>

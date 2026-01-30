@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login – Kokoro</title>
+  <style>
+    body {
+      background-color: #E6D9FF;
+      font-family: Arial;
+      text-align: center;
+      padding-top: 80px;
+    }
+    .card {
+      background: white;
+      width: 320px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 15px;
+    }
+    input, button {
+      width: 90%;
+      padding: 8px;
+      margin: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #9C7CFF;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <img src="penguin.png" width="100"><br><br>
+    <h3>Login</h3>
+
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <p>New here? <a href="signup.html">Sign up</a></p>
+  </div>
+
+<script>
+function login() {
+  const username = document.getElementById("loginUser").value;
+  const password = document.getElementById("loginPass").value;
+
+  const savedUser = JSON.parse(localStorage.getItem("kokoroUser"));
+
+  if (!savedUser) {
+    alert("No account found. Please sign up.");
+    return;
+  }
+
+  if (username === savedUser.username && password === savedUser.password) {
+    alert("Login successful!");
+    window.location.href = "home.html"; // next screen
+  } else {
+    alert("Invalid username or password");
+  }
+}
+</script>
+
+</body>
+</html>

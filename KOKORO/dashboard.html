@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kokoro Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: #E6D9FF;
+      display: flex;
+      overflow-x: hidden; /* Prevents horizontal scroll */
+    }
+    .sub-tab {
+      padding-left: 40px;
+      font-size: 16px;
+      color: #eee;
+      margin: 10px 0;
+      cursor: pointer;
+      display: none; /* Hidden until "Lets Talk" is clicked */
+    }
+    .sub-tab:hover { color: white; text-decoration: underline; }
+    /* SIDEBAR */
+    .sidebar {
+      width: 280px;
+      background: #9C7CFF;
+      color: white;
+      padding: 35px 25px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+
+    .sidebar h2 { font-size: 32px; margin-bottom: 40px; }
+
+    .tab {
+      font-size: 20px;
+      margin: 25px 0;
+      cursor: pointer;
+    }
+
+    /* MAIN CONTENT AREA */
+    .main {
+      flex: 1;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+
+    /* CHATBOT CONTAINER (Right Side) */
+    #chatbot-container {
+      display: none; /* Hidden by default */
+      flex: 1;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+      margin-top: 20px;
+      height: 80vh; /* Adjust height as needed */
+    }
+
+    /* Hide dashboard cards when chat is active */
+    .dashboard-content.hidden {
+      display: none;
+    }
+
+    /* EXISTING CARD STYLES */
+    .top-cards { display: flex; gap: 40px; flex-wrap: wrap; }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 35px;
+      width: 320px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .card img { width: 160px; cursor: pointer; margin-top: 10px; }
+    .streak-number { font-size: 60px; font-weight: bold; color: #9C7CFF; }
+
+    .motivation {
+      margin-top: 40px;
+      background: #FFFFFF;
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 700px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    }
+
+    .calendar {
+      margin-top: 40px;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      width: 500px;
+    }
+    .days { display: flex; justify-content: space-between; margin-top: 20px; }
+    .day { padding: 15px; border-radius: 50%; width: 55px; text-align: center; }
+    .today { background: #9C7CFF; color: white; font-weight: bold; }
+  </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>Kokoro 🌸</h2>
+  <div class="tab" onclick="showDashboard()">✨ You</div>
+  
+  <div class="tab" onclick="toggleMenu()">✨ Lets Talk</div>
+  <div class="sub-tab chat-link" onclick="loadBot('kelly')"> Kelly (Comforting)</div>
+  <div class="sub-tab chat-link" onclick="loadBot('hannah')"> Hannah (Advice)</div>
+  <div class="sub-tab chat-link" onclick="loadBot('darbie')"> Da (Sarcastic)</div>
+
+  <a href="dear-diary.html" style="text-decoration: none; color: inherit;">
+    <div class="tab">✨ Dear Diary</div>
+  </a>
+  <a href="little-wins.html" style="text-decoration: none; color: inherit;">
+    <div class="tab">✨ Little Wins</div>
+  </a>
+  <a href="achievements.html" style="text-decoration:none; color:inherit;">
+    <div class="tab">🏆 Achievements</div>
+  </a>
+</div>
+
+<div class="main">
+
+  <div id="chatbot-container">
+    <iframe 
+        src="http://localhost:8501/?embed=true" 
+        style="height: 100%; width: 100%; border: none;">
+    </iframe>
+  </div>
+
+  <div id="dashboard-view" class="dashboard-content">
+    <div class="top-cards">
+      <div class="card">
+        <h3>Mood Jar</h3>
+        <img src="moodjar.png" onclick="goToMoodJar()">
+        <p style="font-size:18px;">Tap to log today’s feeling</p>
+      </div>
+
+      <div class="card">
+        <h3>Your Streak 🔥</h3>
+        <div class="streak-number" id="streakCount">0</div>
+        <p style="font-size:18px;">days of showing up</p>
+      </div>
+    </div>
+
+    <div class="motivation">
+      <h2>💜 Motivation for Today</h2>
+      <p id="quote"></p>
+    </div>
+
+    <div class="calendar">
+      <h3>This Week</h3>
+      <div class="week-days" id="weekDays" style="display: flex; justify-content: space-between;"></div>
+    </div>
+    
+  </div>
+
+</div>
+
+<script>
+  // UI TOGGLE LOGIC
+  function toggleMenu() {
+    let subs = document.getElementsByClassName('sub-tab');
+    for(let s of subs) {
+      s.style.display = (s.style.display === 'block') ? 'none' : 'block';
+    }
+  }
+  function showChat() {
+      // Hide dashboard, show chat
+      document.getElementById('dashboard-view').style.display = 'none';
+      document.getElementById('chatbot-container').style.display = 'block';
+  }
+  function loadBot(botName) {
+    // Hide dashboard, show chat
+    document.getElementById('dashboard-view').style.display = 'none';
+    document.getElementById('chatbot-container').style.display = 'block';
+    
+    // Change the Iframe source to the specific bot
+    const iframe = document.querySelector('#chatbot-container iframe');
+    iframe.src = `http://localhost:8501/?bot=${botName}&embed=true`;
+  }
+  function showDashboard() {
+      // Show dashboard, hide chat
+      document.getElementById('dashboard-view').style.display = 'block';
+      document.getElementById('chatbot-container').style.display = 'none';
+  }
+
+  function goToMoodJar() { window.location.href = "mood-jar.html"; }
+
+  /* STREAK & QUOTES LOGIC (unchanged) */
+  let streak = parseInt(localStorage.getItem("streak")) || 0;
+  document.getElementById("streakCount").innerText = streak;
+
+  const quotes = ["Small steps still move you forward 💫", "It’s okay to rest. You’re still growing 🌱", "One gentle day at a time ✨"];
+  document.getElementById("quote").innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+  /* WEEK HIGHLIGHT */
+  const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const todayIndex = new Date().getDay();
+  const container = document.getElementById("weekDays");
+
+  days.forEach((day, i) => {
+    const d = document.createElement("div");
+    d.className = "day";
+    d.innerText = day;
+    if (i === todayIndex) d.classList.add("today");
+    container.appendChild(d);
+  });
+</script>
+
+</body>
+</html>

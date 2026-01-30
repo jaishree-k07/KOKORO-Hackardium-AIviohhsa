@@ -1,0 +1,7 @@
+.env
+**/ .env
+mental-health-bot/.env
+history_*.json
+**/history_*.json
+__pycache__/
+.venv/
