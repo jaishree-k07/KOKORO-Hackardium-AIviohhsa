@@ -1,102 +1,90 @@
 import streamlit as st
 from huggingface_hub import InferenceClient
-import os
 import json
+import os
 from dotenv import load_dotenv
 
-# 1. CONFIGURATION
+# 1. Load Environment Variables
 load_dotenv()
-HF_TOKEN = os.getenv("HF_TOKEN")
-# Using Llama-3.2-3B for speed and instruction following
-client = InferenceClient(model="meta-llama/Llama-3.2-3B-Instruct", token=HF_TOKEN)
+client = InferenceClient(api_key=os.getenv("HF_TOKEN"))
 
-
-BOT_CONFIGS = {
-    "kelly": {
-        "name": "Kelly 🌸",
-        "prompt": "Your name is Kelly. You are a comforting and empathizing health assistant. Focus on validating feelings and being soft-spoken.",
+# 2. Personality Configuration
+personalities = {
+    "Kelly": {
+        "description": "Empathic, soft-spoken, and comforting.",
+        "system_message": "You are Kelly, a comforting and empathic wellness assistant. Speak softly and kindly.",
         "file": "history_kelly.json"
     },
-    "hannah": {
-        "name": "Hannah 🧭",
-        "prompt": "Your name is Hannah. You are a wise advice-giving bot. Provide structured, grounded, and practical suggestions for improvement.",
+    "Hannah": {
+        "description": "Structured, practical, and advice-oriented.",
+        "system_message": "You are Hannah, a practical and grounded mentor. Provide structured advice and clear steps.",
         "file": "history_hannah.json"
     },
-    "darbie": {
-        "name": "Darbie 🍯",
-        "prompt": "Your name is Darbie. You are a cheerful and slightly sarcastic bot. Use humor and wit to cheer up the user, but remain helpful.",
+    "Darbie": {
+        "description": "Cheerful, witty, and lighthearted.",
+        "system_message": "You are Darbie, a cheerful and witty companion. Use humor and positive energy.",
         "file": "history_darbie.json"
     }
 }
 
-query_params = st.query_params
-bot_key = query_params.get("bot", "kelly") 
-current_bot = BOT_CONFIGS[bot_key]
-
+# 3. Helper Functions
+def load_history(filename):
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            return json.load(f)
+    return []
 
 def save_history(messages, filename):
     with open(filename, "w") as f:
         json.dump(messages, f)
 
-def load_history(filename, system_prompt):
-    if os.path.exists(filename):
-        with open(filename, "r") as f:
-            return json.load(f)
-    return [{"role": "system", "content": system_prompt}]
+# 4. Streamlit UI Setup
+st.set_page_config(page_title="Kokoro Assistant", page_icon="🌸")
+st.title("🌸 Kokoro AI Companion")
 
+# Personality Selector
+choice = st.sidebar.selectbox("Choose your companion:", list(personalities.keys()))
+current_bot = personalities[choice]
+st.sidebar.write(f"**Current Personality:** {current_bot['description']}")
 
-if "current_bot_key" not in st.session_state or st.session_state.current_bot_key != bot_key:
-    st.session_state.current_bot_key = bot_key
-    st.session_state.messages = load_history(current_bot["file"], current_bot["prompt"])
+# Initialize Chat History for the specific bot
+if "messages" not in st.session_state or st.sidebar.button("Clear Conversation"):
+    st.session_state.messages = load_history(current_bot["file"])
+    if not st.session_state.messages:
+        st.session_state.messages = [{"role": "system", "content": current_bot["system_message"]}]
 
+# Display Chat History
+for msg in st.session_state.messages:
+    if msg["role"] != "system":
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
 
-def search_history_for_context(query, messages):
-    """Parses JSON history for keywords to provide temporal memory."""
-    relevant_past = []
-    keywords = ["last time", "remember", "previous", "happened", "when was"]
-    
-    if any(word in query.lower() for word in keywords):
-        for msg in messages[1:]: 
-            
-            if "happy" in query.lower() and "happy" in msg['content'].lower():
-                relevant_past.append(msg['content'])
-            elif "sad" in query.lower() and "sad" in msg['content'].lower():
-                relevant_past.append(msg['content'])
-        
-        return "\n".join(relevant_past[-3:])
-    return ""
-
-
-st.title(current_bot["name"])
-st.caption(f"Connected to {current_bot['name']} | Personality: {bot_key.capitalize()}")
-
-
-chat_log = json.dumps(st.session_state.messages, indent=2)
-st.sidebar.download_button(f"💾 Download {current_bot['name']} Log", chat_log, f"{bot_key}_chat.json")
-
-
-for message in st.session_state.messages:
-    if message["role"] != "system":
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-if prompt := st.chat_input("How are you?"):
+# 5. Chat Interaction Logic
+if prompt := st.chat_input(f"Talk to {choice}..."):
+    # Display user message
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    bot_text = "" 
+    # CRITICAL: Initialize bot_text as empty to prevent NameError
+    bot_text = ""
 
     try:
         with st.chat_message("assistant"):
-            response = client.chat_completion(messages=st.session_state.messages, max_tokens=300)
+            # Call Hugging Face API
+            response = client.chat_completion(
+                model="meta-llama/Llama-3.2-3B-Instruct",
+                messages=st.session_state.messages,
+                max_tokens=500,
+                stream=False
+            )
             bot_text = response.choices[0].message.content
             st.markdown(bot_text)
         
-        
+        # Save to history ONLY if response was successful
         if bot_text:
             st.session_state.messages.append({"role": "assistant", "content": bot_text})
             save_history(st.session_state.messages, current_bot["file"])
             
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"⚠️ Connection Error: {e}. Please check your HF_TOKEN.")
