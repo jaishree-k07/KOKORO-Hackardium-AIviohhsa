@@ -1,63 +1,82 @@
-🌸 Kokoro Holistic Wellness Ecosystem
-This repository contains a holistic emotional wellness platform built for the AI WARS Hackathon. The ecosystem integrates traditional self-reflection tools with an advanced, multi-personality AI assistant to provide a safe and calming space for personal growth.
+# 🌸 Kokoro: An AI-Powered Mental Health Ecosystem
 
-📋 Overview
-Kokoro (Japanese for "Heart") bridges the gap between manual wellness tracking and modern intelligent support. The project leverages Streamlit for its backend logic and a sophisticated Llama-3.2-3B model to offer personalized guidance through three distinct AI personas.
+**Kokoro**  is a holistic wellness platform designed to bridge the gap between traditional mental health tracking and modern AI-driven support. Built for the **AI WARS Hackathon**, this ecosystem provides users with a safe, calming space to log emotions, track achievements, and receive personalized guidance from a trio of specialized AI personalities.
 
-✨ Features
-Interactive Mood Jar: A visual tracking system using LocalStorage to log daily feelings via digital "droplets".
+## 🚀 Project Overview
 
-Triple-Personality AI Support: Specialized assistance through three unique personas:
+The ecosystem is divided into two main components:
 
-Kelly: Focused on empathy and comfort.
+1. **AI WARS Dashboard**: A comprehensive HTML/CSS/JS frontend featuring interactive tools like the Mood Jar and Dear Diary.
+2. **Serene Healthbot**: A Python-based multi-personality chatbot powered by Large Language Models (LLMs).
 
-Hannah: Focused on grounded, practical advice.
+---
 
-Darbie: Focused on cheerful wit and lighthearted distraction.
+## ✨ Key Features
 
-Smart Searchable History: Utilizes Context Injection to allow the AI to recall and summarize past user conversations from local JSON logs.
+### 🎮 The Dashboard (AI WARS)
 
-Gamified Wellness: Built-in streak tracking and achievement milestones to encourage consistent self-care.
+* **Mood Jar**: A visual, interactive way to log daily emotions using emoji "droplets".
+* **Streak Tracker**: Gamified check-ins using Browser LocalStorage to encourage consistency.
+* **Dear Diary & Little Wins**: Dedicated sections for long-form reflection and celebrating micro-victories.
+* **Dynamic Motivation**: Real-time affirmation generator to boost user morale.
 
-🛠️ Tech Stack
-Frontend: HTML5, CSS3 (Flexbox/Grid), JavaScript (ES6+).
+### 🤖 The AI Chatbot (Triple-Personality System)
 
-Backend: Python 3.11, Streamlit.
+* **Kelly (Comfort)**: Empathic and soft-spoken for emotional validation.
+* **Hannah (Advice)**: Structured and practical for goal-oriented guidance.
+* **Darbie (Wit)**: Cheerful and slightly sarcastic to provide lighthearted distraction.
+* **Smart Searchable History**: Implements **Context Injection** allowing the AI to "remember" and recall past conversations from local JSON logs.
 
-AI Logic: Hugging Face Inference API using Llama-3.2-3B-Instruct.
+---
 
-Data Persistence: Browser LocalStorage and JSON-based file storage.
+## 🛠️ Technical Stack
 
-🚀 Getting Started
-1. Installation
-Clone the repository and install the necessary dependencies:
+* **Frontend**: HTML5, CSS3 (Flexbox/Grid), JavaScript (ES6+).
+* **Backend**: Python 3.11, Streamlit.
+* **AI Engine**: **Llama-3.2-3B-Instruct** hosted via **Hugging Face Inference API**.
+* **Data Persistence**: JSON-based local storage for chat history and Browser LocalStorage for dashboard stats.
 
-Bash
-git clone https://github.com/YOUR_USERNAME/KOKORO-Hackardium-AIviohhsa.git
-cd KOKORO-Hackardium-AIviohhsa
-pip install -r requirements.txt
+---
 
-2. Configure Environment
-Create a .env file in the mental-health-bot/ directory and add your Hugging Face API token:
+## 📦 Installation & Setup
 
-Plaintext
-HF_TOKEN=your_token_here
+1. **Clone the Repository**:
+```bash
+git clone https://github.com/YOUR_USERNAME/Kokoro-Project.git
 
-3. Run the Ecosystem
-Launch the AI Assistant:
+```
 
-Bash
-streamlit run mental-health-bot/app.py
-Launch the Dashboard: Open AI-WARS/dashboard.html in any modern web browser.
 
-🛡️ Privacy & Security
-The platform is designed with a Privacy-First approach:
+2. **Install Python Dependencies**:
+```bash
+pip install streamlit huggingface-hub python-dotenv
 
-Data Isolation: Each AI personality maintains separate JSON logs to prevent cross-persona data leakage.
+```
 
-Local-First Storage: Personal metrics and logs are stored strictly on the user's local machine.
 
+3. **Configure Environment**:
+Create a `.env` file in the `mental-health-bot` folder and add your Hugging Face Token:
+```text
+HF_TOKEN=your_huggingface_token_here
+
+```
+
+
+4. **Launch the Services**:
+* **Run Chatbot**: `streamlit run mental-health-bot/app.py`
+* **Open Dashboard**: Simply open `AI-WARS/dashboard.html` in any modern web browser.
+
+
+
+---
+
+## 🛡️ Privacy & Security
+
+* **Data Isolation**: Each AI personality maintains its own isolated JSON history file to prevent information leakage between bots.
+* **Local Storage**: All personal dashboard data is stored locally on the user's machine, ensuring maximum privacy.
+
+---
 ## 🗺️ Future Roadmap
 - [ ] **AI-Powered Sentiment Trends**: Visualizing mood shifts over a month using classification models.
 - [ ] **Voice-to-Text Journaling**: Integration of speech recognition for hands-free reflection.
-- [ ] **Localized Language Support**: Expanding Haru, Atlas, and Honey to speak multiple languages.
+- [ ] **Localized Language Support**: Expanding Kelly, Hannah, and Darbie to speak multiple languages.
